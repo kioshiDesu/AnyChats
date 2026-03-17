@@ -107,8 +107,6 @@ export function Chat() {
     if (parsedSkill) {
       const skill = builtInSkills.find(s => s.name === parsedSkill.skillName);
       if (skill) {
-        // extract basic params (we'll just pass the whole string as the main parameter for now)
-        // A full implementation would parse key=value args from parsedSkill.params
         const mainParamName = Object.keys(skill.parameters)[0];
         const params: any = {};
         if (mainParamName) {
@@ -122,9 +120,7 @@ export function Chat() {
              apiOptions: { apiMode, apiKey, localEndpoint, model: selectedModel, temperature, topP, maxTokens },
              createFile,
              updateFile,
-             onProgress: () => {
-               // Optional: Show progress somewhere
-             }
+             onProgress: () => {}
           });
           
           useStore.getState().addMessage(currentConversationId, {
@@ -230,20 +226,19 @@ export function Chat() {
       return;
     }
     
-    // Check if file exists
     const existingFile = (files || []).find(f => f?.path === filename);
     try {
       if (existingFile) {
-        if (window.confirm(`Are you sure you want to overwrite ${filename}?`)) {
+        if (window.confirm(`Overwrite ${filename}?`)) {
           await updateFile(existingFile.id, content);
-          alert(`${filename} updated successfully!`);
+          alert(`${filename} updated.`);
         }
       } else {
         await createFile(filename, 'file', content);
-        alert(`${filename} created successfully!`);
+        alert(`${filename} created.`);
       }
     } catch (e: any) {
-      alert(`Error applying code: ${e.message}`);
+      alert(`Error: ${e.message}`);
     }
   };
 
@@ -293,67 +288,56 @@ export function Chat() {
 
   if (!currentConversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 h-[100dvh]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-neutral-950 h-[100dvh]">
         <button
           onClick={() => setSidebarOpen(true)}
           aria-label="Toggle Sidebar"
-          className="absolute top-4 left-4 md:hidden p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
+          className="absolute top-4 left-4 md:hidden p-2 rounded hover:bg-white/[0.06] text-neutral-400 transition-colors"
         >
-          <Menu size={24} />
+          <Menu size={20} />
         </button>
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">OpenRouter Mobile Chat</h2>
-          <p className="text-gray-500 dark:text-gray-400">Select or create a conversation to get started</p>
+        <div className="text-center space-y-3 max-w-sm px-6">
+          <h2 className="text-xl font-semibold text-white tracking-tight">OpenRouter Mobile Chat</h2>
+          <p className="text-sm text-neutral-500 leading-relaxed">Select or create a conversation to get started</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 min-w-0 flex flex-col h-[100dvh] bg-gray-50 dark:bg-gray-800 relative">
-      <header className="flex items-center gap-3 p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-10 sticky top-0">
+    <div className="flex-1 min-w-0 flex flex-col h-[100dvh] bg-neutral-950 relative">
+      {/* Header */}
+      <header className="flex items-center gap-3 px-4 h-12 bg-neutral-950 border-b border-white/[0.06] z-10 sticky top-0">
         <button
           onClick={() => setSidebarOpen(true)}
           aria-label="Toggle Sidebar"
-          className="md:hidden p-2 -ml-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
+          className="md:hidden p-1.5 -ml-1.5 rounded hover:bg-white/[0.06] text-neutral-400 transition-colors"
         >
-          <Menu size={24} />
+          <Menu size={18} />
         </button>
         <div className="flex flex-col flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold truncate text-gray-800 dark:text-white">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-sm font-medium truncate text-white">
               {currentConversation.title}
             </h1>
             {currentProject && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-                Workspace: {currentProject.name}
+              <span className="text-[11px] font-medium text-neutral-500 shrink-0">
+                {currentProject.name}
               </span>
             )}
-            {apiMode === 'local' ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                <MonitorSmartphone size={12} />
-                Local
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                <Network size={12} />
-                Cloud
-              </span>
-            )}
+            <span className="text-[11px] font-medium text-neutral-600 shrink-0">
+              {apiMode === 'local' ? 'Local' : 'Cloud'}
+            </span>
             {isOffline && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 ml-1">
-                Offline
-              </span>
+              <span className="text-[11px] font-medium text-danger shrink-0">Offline</span>
             )}
             {apiMode === 'local' && ollamaStatus === 'offline' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 ml-1">
-                Ollama Down
-              </span>
+              <span className="text-[11px] font-medium text-danger shrink-0">Ollama down</span>
             )}
           </div>
         </div>
         {currentConversation.messages.length > 0 && (
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-0.5 shrink-0">
             <button
               onClick={() => {
                 const data = JSON.stringify(currentConversation, null, 2);
@@ -367,35 +351,36 @@ export function Chat() {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
               }}
-              title="Export Conversation"
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              title="Export conversation"
+              className="p-1.5 rounded hover:bg-white/[0.06] text-neutral-500 hover:text-white transition-colors"
             >
-              <Download size={20} />
+              <Download size={16} strokeWidth={1.5} />
             </button>
             <button
               onClick={() => {
-                if (window.confirm('Are you sure you want to clear this conversation?')) {
+                if (window.confirm('Clear this conversation?')) {
                   clearMessages(currentConversation.id);
                 }
               }}
-              title="Clear Messages"
-              className="p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/30 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+              title="Clear messages"
+              className="p-1.5 rounded hover:bg-white/[0.06] text-neutral-500 hover:text-danger transition-colors"
             >
-              <Eraser size={20} />
+              <Eraser size={16} strokeWidth={1.5} />
             </button>
           </div>
         )}
       </header>
 
+      {/* Messages */}
       <div className="relative flex-1 min-h-0 flex flex-col">
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto overflow-x-hidden w-full pb-4"
+          className="flex-1 overflow-y-auto overflow-x-hidden w-full"
         >
         {currentConversation.messages.length > 50 && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm text-center py-2 px-4 shadow-sm border-b border-yellow-200 dark:border-yellow-900/50">
-            Warning: This conversation is very long. Consider starting a new chat to avoid high token costs or API limits.
+          <div className="bg-warning-soft text-warning text-[13px] text-center py-2 px-4 border-b border-warning/20">
+            This conversation is long. Consider starting a new chat for lower token costs.
           </div>
         )}
         {currentConversation.messages.map((msg, index) => {
@@ -449,7 +434,6 @@ export function Chat() {
                         fullContent += chunk;
                         setStreamingContent(fullContent);
                       }
-                      // Replace the "Retrying..." message with final content
                       useStore.getState().updateMessage(currentConversation.id, msg.id, fullContent);
                     } catch (error: any) {
                       if (error.name === 'AbortError') return;
@@ -507,28 +491,30 @@ export function Chat() {
         {showScrollButton && (
           <button
             onClick={() => scrollToBottom('smooth')}
-            className="absolute bottom-4 right-4 p-2 bg-white dark:bg-gray-700 rounded-full shadow-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all z-20"
+            className="absolute bottom-4 right-4 p-2 bg-surface-2 rounded-full shadow-lg border border-white/[0.08] text-neutral-400 hover:text-white hover:bg-surface-3 transition-colors z-20"
           >
-            <ArrowDown size={20} />
+            <ArrowDown size={16} />
           </button>
         )}
       </div>
 
-      <div className="w-full shrink-0 bg-gray-50 dark:bg-gray-800 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] px-4 border-t border-gray-200 dark:border-gray-700/50">
+      {/* Input area */}
+      <div className="w-full shrink-0 bg-neutral-950 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] px-4 border-t border-white/[0.06]">
         <div className="max-w-3xl mx-auto w-full">
           {input.startsWith('/') && (
-            <div className="mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
-              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-500 uppercase">Available Skills</div>
+            <div className="mb-2 bg-surface-1 rounded border border-white/[0.08] overflow-hidden text-sm">
+              <div className="px-3 py-1.5 bg-surface-2 border-b border-white/[0.06] text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Skills</div>
               {builtInSkills.map(skill => (
-                <div key={skill.name} onClick={() => setInput(`/${skill.name} `)} className="px-3 py-2 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-300">
-                  <span className="font-semibold text-blue-600 dark:text-blue-400">/{skill.name}</span> - {skill.description}
+                <div key={skill.name} onClick={() => setInput(`/${skill.name} `)} className="px-3 py-2 cursor-pointer hover:bg-white/[0.04] text-neutral-300">
+                  <span className="font-medium text-neutral-200">/{skill.name}</span>{' '}
+                  <span className="text-neutral-500">— {skill.description}</span>
                 </div>
               ))}
             </div>
           )}
           <form
             onSubmit={handleSubmit}
-            className="relative flex items-end gap-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all p-2"
+            className="relative flex items-end gap-2 bg-surface-1 rounded border border-white/[0.08] overflow-hidden focus-within:border-accent/40 transition-colors p-1.5"
           >
             <textarea
               value={input}
@@ -544,90 +530,87 @@ export function Chat() {
                   e.currentTarget.style.height = 'auto';
                 }
               }}
-              placeholder={(apiMode === 'cloud' && !apiKey) ? "Please configure API key first" : "Type a message or /skill..."}
-              className="flex-1 max-h-48 min-h-[44px] bg-transparent resize-none py-3 px-3 outline-none text-gray-900 dark:text-white placeholder-gray-500"
+              placeholder={(apiMode === 'cloud' && !apiKey) ? "Configure API key first..." : "Message..."}
+              className="flex-1 max-h-48 min-h-[40px] bg-transparent resize-none py-2.5 px-2.5 outline-none text-white text-[15px] placeholder-neutral-600"
               rows={1}
               disabled={(apiMode === 'cloud' && !apiKey) || isLoading}
             />
             <button
               type="button"
               onClick={handleVoiceInput}
-              className={`p-3 rounded-xl transition-colors flex-shrink-0 mb-1 ${isListening ? 'bg-red-100 text-red-600 dark:bg-red-900/30' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-              title="Voice Input"
+              className={`p-2 rounded transition-colors shrink-0 ${isListening ? 'text-danger' : 'text-neutral-500 hover:text-white'}`}
+              title="Voice input"
             >
-              <Mic size={20} className={isListening ? 'animate-pulse' : ''} />
+              <Mic size={18} strokeWidth={1.5} className={isListening ? 'animate-pulse' : ''} />
             </button>
             {isStreaming ? (
               <button
                 type="button"
                 onClick={handleStop}
-                className="p-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors flex-shrink-0 mb-1"
+                className="p-2 text-danger hover:bg-danger-soft rounded transition-colors shrink-0"
                 aria-label="Stop generation"
               >
-                <StopCircle size={20} />
+                <StopCircle size={18} strokeWidth={1.5} />
               </button>
             ) : isLoading ? (
               <button
                 type="button"
                 disabled
-                className="p-3 bg-blue-600 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 mb-1"
+                className="p-2 text-neutral-500 rounded shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Loader2 size={20} className="ml-1 animate-spin" />
+                <Loader2 size={18} strokeWidth={1.5} className="animate-spin" />
               </button>
             ) : (
               <button
                 type="submit"
                 disabled={!input.trim() || (apiMode === 'cloud' && !apiKey)}
                 aria-label="Send message"
-                className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 mb-1"
+                className="p-2 text-accent hover:bg-accent-muted rounded transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <Send size={20} className="ml-1" />
+                <Send size={18} strokeWidth={1.5} />
               </button>
             )}
           </form>
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-            {currentProject && (
-              <>
-                <button onClick={() => {
-                  let projType = 'Unknown';
-                  const safeFiles = files || [];
-                  const pkgJson = safeFiles.find(f => f?.path === 'package.json');
-                  if (pkgJson) {
-                    try {
-                      const pkg = JSON.parse(pkgJson.content);
-                      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-                      if (deps.react) projType = 'React';
-                      if (deps.vue) projType = 'Vue';
-                      if (deps['@angular/core']) projType = 'Angular';
-                      if (deps.next) projType = 'Next.js';
-                    } catch {}
-                  } else if (safeFiles.find(f => f?.path?.endsWith('.py'))) {
-                    projType = 'Python';
+
+          {/* Quick actions */}
+          {currentProject && (
+            <div className="flex flex-wrap items-center gap-2 mt-2.5 mb-1">
+              <button onClick={() => {
+                let projType = 'Unknown';
+                const safeFiles = files || [];
+                const pkgJson = safeFiles.find(f => f?.path === 'package.json');
+                if (pkgJson) {
+                  try {
+                    const pkg = JSON.parse(pkgJson.content);
+                    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+                    if (deps.react) projType = 'React';
+                    if (deps.vue) projType = 'Vue';
+                    if (deps['@angular/core']) projType = 'Angular';
+                    if (deps.next) projType = 'Next.js';
+                  } catch {}
+                } else if (safeFiles.find(f => f?.path?.endsWith('.py'))) {
+                  projType = 'Python';
+                }
+                
+                setInput(`This workspace appears to be a ${projType} project. Can you explain the overall project architecture, entry points, and dependencies based on the current workspace context?`);
+              }} className="text-[12px] px-2.5 py-1 rounded bg-white/[0.06] text-neutral-400 hover:bg-white/[0.08] hover:text-neutral-300 transition-colors">Analyze architecture</button>
+              <button onClick={() => {
+                const worker = new Worker(new URL('../workers/eslint.worker.ts', import.meta.url), { type: 'module' });
+                worker.onmessage = (e) => {
+                  const results = e.data;
+                  if (results.length > 0) {
+                    const lintReport = results.map((r: any) => `[${r.severity}] ${r.file}:${r.line} - ${r.message}`).join('\n');
+                    setInput(`I ran a linter and found these issues. Please review them and explain how to fix them:\n\n\`\`\`text\n${lintReport}\n\`\`\``);
+                  } else {
+                    setInput("The linter passed. Perform a deeper code review for complex logic bugs or anti-patterns.");
                   }
-                  
-                  setInput(`This workspace appears to be a ${projType} project. Can you explain the overall project architecture, entry points, and dependencies based on the current workspace context?`);
-                }} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Analyze Architecture</button>
-                <button onClick={() => {
-                  const worker = new Worker(new URL('../workers/eslint.worker.ts', import.meta.url), { type: 'module' });
-                  worker.onmessage = (e) => {
-                    const results = e.data;
-                    if (results.length > 0) {
-                      const lintReport = results.map((r: any) => `[${r.severity}] ${r.file}:${r.line} - ${r.message}`).join('\n');
-                      setInput(`I ran a linter and found these issues. Please review them and explain how to fix them:\n\n\`\`\`text\n${lintReport}\n\`\`\``);
-                    } else {
-                      setInput("Please perform a deeper AI code review for any complex logic bugs or anti-patterns, the linter passed completely.");
-                    }
-                    worker.terminate();
-                  };
-                  worker.postMessage({ files });
-                }} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">AI Code Review (Lint)</button>
-                <button onClick={() => setInput("Create a new full-stack project structure for a [Describe your app] app.")} className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Generate Project</button>
-              </>
-            )}
-            <span className="text-xs text-gray-400 dark:text-gray-500 w-full text-center mt-1">
-              OpenRouter Mobile Chat • {apiMode === 'local' ? 'Local Mode (Ollama)' : 'Cloud Mode (OpenRouter)'}
-            </span>
-          </div>
+                  worker.terminate();
+                };
+                worker.postMessage({ files });
+              }} className="text-[12px] px-2.5 py-1 rounded bg-white/[0.06] text-neutral-400 hover:bg-white/[0.08] hover:text-neutral-300 transition-colors">Lint review</button>
+              <button onClick={() => setInput("Create a new full-stack project structure for a [Describe your app] app.")} className="text-[12px] px-2.5 py-1 rounded bg-white/[0.06] text-neutral-400 hover:bg-white/[0.08] hover:text-neutral-300 transition-colors">Generate project</button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -29,34 +29,35 @@ export function WorkspaceExplorer() {
   };
 
   return (
-    <div className="mt-4 border-t border-gray-800 pt-4">
-      <div className="flex items-center justify-between px-3 mb-2">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-          <FolderOpen size={14} />
-          {currentProject.name} Files
-        </h3>
-        <div className="flex items-center gap-1">
-          <button onClick={() => setPreviewOpen(true)} className="p-1 hover:bg-emerald-600/20 rounded text-emerald-500 hover:text-emerald-400" title="Run / Preview">
-            <Play size={14} />
+    <div className="mt-3 border-t border-white/[0.06] pt-3">
+      {/* Section header */}
+      <div className="flex items-center justify-between px-2 mb-2">
+        <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+          {currentProject.name}
+        </span>
+        <div className="flex items-center gap-0.5">
+          <button onClick={() => setPreviewOpen(true)} className="p-1.5 rounded text-neutral-500 hover:text-success hover:bg-success-soft transition-colors" title="Preview">
+            <Play size={13} strokeWidth={2} />
           </button>
-          <button onClick={() => exportProjectAsZip(currentProject.id, currentProject.name)} className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Export as ZIP">
-            <Download size={14} />
+          <button onClick={() => exportProjectAsZip(currentProject.id, currentProject.name)} className="p-1.5 rounded text-neutral-500 hover:text-white hover:bg-white/[0.06] transition-colors" title="Export ZIP">
+            <Download size={13} strokeWidth={1.5} />
           </button>
-          <button onClick={() => exportProjectAsSingleFile(currentProject.id, currentProject.name)} className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="Export as Single File">
-            <FileType2 size={14} />
+          <button onClick={() => exportProjectAsSingleFile(currentProject.id, currentProject.name)} className="p-1.5 rounded text-neutral-500 hover:text-white hover:bg-white/[0.06] transition-colors" title="Export single file">
+            <FileType2 size={13} strokeWidth={1.5} />
           </button>
-          <button onClick={() => setIsCreating('file')} className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white" title="New File">
-            <Plus size={14} />
+          <button onClick={() => setIsCreating('file')} className="p-1.5 rounded text-neutral-500 hover:text-white hover:bg-white/[0.06] transition-colors" title="New file">
+            <Plus size={13} strokeWidth={2} />
           </button>
         </div>
       </div>
 
+      {/* Create input */}
       {isCreating && (
-        <div className="px-3 py-2 flex items-center gap-2 text-sm">
+        <div className="px-2 pb-2">
           <input
             autoFocus
             type="text"
-            className="flex-1 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-white"
+            className="w-full bg-white/[0.06] border border-white/[0.08] rounded px-2.5 py-1.5 text-sm text-white placeholder-neutral-500 outline-none focus:border-accent transition-colors"
             placeholder={`path/to/${isCreating}...`}
             value={newPath}
             onChange={(e) => setNewPath(e.target.value)}
@@ -68,14 +69,18 @@ export function WorkspaceExplorer() {
         </div>
       )}
 
-      <div className="px-1 space-y-0.5 max-h-48 overflow-y-auto custom-scrollbar">
+      {/* File list */}
+      <div className="space-y-px max-h-48 overflow-y-auto custom-scrollbar">
         {(!deferredFiles || deferredFiles.length === 0) && !isCreating ? (
-          <div className="text-xs text-gray-500 px-3 italic">No files in workspace</div>
+          <div className="px-2 py-3 text-center">
+            <p className="text-xs text-neutral-500">No files yet</p>
+            <p className="text-[11px] text-neutral-600 mt-0.5">Create a file or import a project</p>
+          </div>
         ) : (
           (deferredFiles || []).map((file) => file ? (
             <div
               key={file.id}
-              className="group flex items-center justify-between rounded px-2 py-1.5 text-xs text-gray-300 hover:bg-gray-800 cursor-pointer"
+              className="group flex items-center justify-between rounded px-2 py-1.5 text-sm text-neutral-400 hover:bg-white/[0.06] hover:text-white cursor-pointer transition-colors"
             >
               <div 
                 className="flex items-center gap-2 truncate flex-1"
@@ -86,22 +91,22 @@ export function WorkspaceExplorer() {
                 }}
               >
                 {file.type === 'folder' ? (
-                  <FolderOpen size={14} className="text-blue-400 shrink-0" />
+                  <FolderOpen size={14} strokeWidth={1.5} className="text-neutral-500 shrink-0" />
                 ) : (
-                  <FileCode size={14} className="text-emerald-400 shrink-0" />
+                  <FileCode size={14} strokeWidth={1.5} className="text-neutral-500 shrink-0" />
                 )}
-                <span className="truncate">{file.path}</span>
+                <span className="truncate text-[13px]">{file.path}</span>
               </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (window.confirm(`Are you sure you want to delete "${file.path}"?`)) {
+                  if (window.confirm(`Delete "${file.path}"?`)) {
                     deleteFile(file.id);
                   }
                 }}
-                className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-red-400 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-danger transition-opacity"
               >
-                <Trash2 size={12} />
+                <Trash2 size={12} strokeWidth={1.5} />
               </button>
             </div>
           ) : null)

@@ -106,7 +106,7 @@ export default function App() {
 
   return (
     <div 
-      className="flex h-[100dvh] w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-hidden font-sans"
+      className="flex h-[100dvh] w-full bg-neutral-950 text-white overflow-hidden font-sans"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
