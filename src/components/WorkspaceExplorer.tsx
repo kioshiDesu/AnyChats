@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useDeferredValue } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { useFileSystem } from '../hooks/useFileSystem';
 import { FileCode, FolderOpen, Plus, Trash2, Download, FileType2, Play } from 'lucide-react';
@@ -6,9 +6,12 @@ import { exportProjectAsZip, exportProjectAsSingleFile } from '../utils/projectE
 import { useStore } from '../store/useStore';
 
 export function WorkspaceExplorer() {
-  const { currentProject, files } = useWorkspaceStore();
+  const currentProject = useWorkspaceStore(state => state.currentProject);
+  const files = useWorkspaceStore(state => state.files);
   const setPreviewOpen = useStore((state) => state.setPreviewOpen);
   const { createFile, deleteFile } = useFileSystem();
+
+  const deferredFiles = useDeferredValue(files);
   const [isCreating, setIsCreating] = useState<'file' | 'folder' | null>(null);
   const [newPath, setNewPath] = useState('');
 
@@ -66,10 +69,10 @@ export function WorkspaceExplorer() {
       )}
 
       <div className="px-1 space-y-0.5 max-h-48 overflow-y-auto custom-scrollbar">
-        {(!files || files.length === 0) && !isCreating ? (
+        {(!deferredFiles || deferredFiles.length === 0) && !isCreating ? (
           <div className="text-xs text-gray-500 px-3 italic">No files in workspace</div>
         ) : (
-          (files || []).map((file) => file ? (
+          (deferredFiles || []).map((file) => file ? (
             <div
               key={file.id}
               className="group flex items-center justify-between rounded px-2 py-1.5 text-xs text-gray-300 hover:bg-gray-800 cursor-pointer"

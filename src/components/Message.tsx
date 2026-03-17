@@ -16,13 +16,16 @@ interface MessageProps {
   onApplyCode?: (filename: string, text: string) => void;
 }
 
-export function Message({ message, isTyping, onRetry, onApplyCode }: MessageProps) {
+const MessageComponent = ({ message, isTyping, onRetry, onApplyCode }: MessageProps) => {
   const isUser = message.role === 'user';
   const [copiedText, setCopiedText] = React.useState<string | null>(null);
   const [showApplyAllModal, setShowApplyAllModal] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
 
-  const { files, currentProject, updateFile, createFile } = useWorkspaceStore();
+  const files = useWorkspaceStore(state => state.files);
+  const currentProject = useWorkspaceStore(state => state.currentProject);
+  const updateFile = useWorkspaceStore(state => state.updateFile);
+  const createFile = useWorkspaceStore(state => state.createFile);
 
   const codeBlocksWithPaths = useMemo(() => {
     const blocks: ApplyAllFile[] = [];
@@ -283,4 +286,12 @@ export function Message({ message, isTyping, onRetry, onApplyCode }: MessageProp
       )}
     </div>
   );
-}
+};
+
+export const Message = React.memo(MessageComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.message.id === nextProps.message.id &&
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.isTyping === nextProps.isTyping
+  );
+});

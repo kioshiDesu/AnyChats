@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useStore } from '../store/useStore';
 import { streamChat, sendMessage, ApiOptions } from '../services/api';
 import { Message } from './Message';
@@ -42,6 +42,28 @@ export function Chat() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+
+  const projectContext = useMemo(() => {
+    if (!currentProject) return '';
+    let context = `\n\n--- Current Active Workspace Project: ${currentProject.name} ---\n` +
+      `This is a virtual file system. When writing code, ALWAYS add the target file path in your codeblocks (e.g., \`\`\`tsx path="src/App.tsx"\`\`\`) to allow automatic file generation.\n\n` +
+      `Project Files:\n`;
+
+    let contextSize = 0;
+    const MAX_CONTEXT_CHARS = 40000;
+    const activeFiles = (files || []).filter(f => f?.type === 'file');
+
+    for (const f of activeFiles) {
+      const fileStr = `File: ${f.path}\n\`\`\`\n${f.content}\n\`\`\`\n`;
+      if (contextSize + fileStr.length > MAX_CONTEXT_CHARS) {
+        context += `\n... (Other files omitted due to context length limits. Focus on the ones provided.)\n`;
+        break;
+      }
+      context += fileStr;
+      contextSize += fileStr.length;
+    }
+    return context;
+  }, [currentProject, files]);
 
   const currentConversation = conversations.find(
     (c) => c.id === currentConversationId
@@ -128,24 +150,7 @@ export function Chat() {
     ].map((m) => ({ role: m.role, content: m.content }));
 
     let finalSystemPrompt = systemPrompt.trim();
-    if (currentProject) {
-      let projectContext = `\n\n--- Current Active Workspace Project: ${currentProject.name} ---\n` +
-        `This is a virtual file system. When writing code, ALWAYS add the target file path in your codeblocks (e.g., \`\`\`tsx path="src/App.tsx"\`\`\`) to allow automatic file generation.\n\n` +
-        `Project Files:\n`;
-
-      let contextSize = 0;
-      const MAX_CONTEXT_CHARS = 40000; // Limit roughly ~10k tokens
-      const activeFiles = (files || []).filter(f => f?.type === 'file');
-      
-      for (const f of activeFiles) {
-        const fileStr = `File: ${f.path}\n\`\`\`\n${f.content}\n\`\`\`\n`;
-        if (contextSize + fileStr.length > MAX_CONTEXT_CHARS) {
-          projectContext += `\n... (Other files omitted due to context length limits. Focus on the ones provided.)\n`;
-          break;
-        }
-        projectContext += fileStr;
-        contextSize += fileStr.length;
-      }
+    if (projectContext) {
       finalSystemPrompt += projectContext;
     }
 
@@ -411,24 +416,7 @@ export function Chat() {
                 const contextMessages = messagesWithoutError.map((m) => ({ role: m.role, content: m.content }));
                 let finalSystemPrompt = systemPrompt.trim();
                 
-                if (currentProject) {
-                  let projectContext = `\n\n--- Current Active Workspace Project: ${currentProject.name} ---\n` +
-                    `This is a virtual file system. When writing code, ALWAYS add the target file path in your codeblocks (e.g., \`\`\`tsx path="src/App.tsx"\`\`\`) to allow automatic file generation.\n\n` +
-                    `Project Files:\n`;
-
-                  let contextSize = 0;
-                  const MAX_CONTEXT_CHARS = 40000;
-                  const activeFiles = (files || []).filter(f => f?.type === 'file');
-                  
-                  for (const f of activeFiles) {
-                    const fileStr = `File: ${f.path}\n\`\`\`\n${f.content}\n\`\`\`\n`;
-                    if (contextSize + fileStr.length > MAX_CONTEXT_CHARS) {
-                      projectContext += `\n... (Other files omitted due to context length limits)\n`;
-                      break;
-                    }
-                    projectContext += fileStr;
-                    contextSize += fileStr.length;
-                  }
+                if (projectContext) {
                   finalSystemPrompt += projectContext;
                 }
 

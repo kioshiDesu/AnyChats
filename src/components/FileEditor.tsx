@@ -5,7 +5,9 @@ import { X, Save, Clock } from 'lucide-react';
 import { VersionHistoryModal } from './VersionHistoryModal';
 
 export function FileEditor() {
-  const { activeFileId, setActiveFileId, files } = useWorkspaceStore();
+  const activeFileId = useWorkspaceStore(state => state.activeFileId);
+  const setActiveFileId = useWorkspaceStore(state => state.setActiveFileId);
+  const files = useWorkspaceStore(state => state.files);
   const { updateFile } = useFileSystem();
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
