@@ -126,8 +126,8 @@ const MessageComponent = ({ message, isTyping, onRetry, onApplyCode }: MessagePr
             className={clsx(
               'w-6 h-6 rounded flex items-center justify-center text-[11px] font-semibold',
               isUser 
-                ? 'bg-white/[0.08] text-neutral-400' 
-                : 'bg-accent-muted text-accent'
+                ? 'bg-surface-3 text-neutral-300' 
+                : 'bg-accent text-white'
             )}
           >
             {isUser ? 'U' : 'AI'}
@@ -158,7 +158,7 @@ const MessageComponent = ({ message, isTyping, onRetry, onApplyCode }: MessagePr
                 <div className="mb-3 flex items-center gap-2">
                   <button
                     onClick={() => setShowApplyAllModal(true)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-accent-muted text-accent rounded text-xs font-medium hover:bg-accent/20 transition-colors"
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-secondary-soft text-secondary rounded text-xs font-medium hover:bg-secondary-soft/80 transition-colors"
                   >
                     <Layers size={13} strokeWidth={1.5} />
                     Apply all ({codeBlocksWithPaths.length})
@@ -202,7 +202,7 @@ const MessageComponent = ({ message, isTyping, onRetry, onApplyCode }: MessagePr
                                   return (
                                     <button
                                       onClick={() => onApplyCode && onApplyCode(filename, text)}
-                                      className="flex items-center gap-1 px-2 py-0.5 text-[11px] rounded hover:bg-white/[0.06] text-success transition-colors min-w-0"
+                                      className="flex items-center gap-1 px-2 py-0.5 text-[11px] rounded hover:bg-secondary-soft/30 text-secondary transition-colors min-w-0"
                                       title={`Apply to ${filename}`}
                                     >
                                       <Check size={12} strokeWidth={2} className="shrink-0" />

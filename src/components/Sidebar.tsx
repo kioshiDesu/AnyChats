@@ -47,7 +47,7 @@ export function Sidebar() {
         <div className="flex h-14 items-center justify-between px-3 border-b border-white/[0.06]">
           <button
             onClick={() => createConversation()}
-            className="flex items-center gap-2 rounded px-3 py-2 text-sm font-medium hover:bg-white/[0.06] transition-colors flex-1 text-left"
+            className="flex items-center gap-2 rounded px-3 py-2 text-sm font-medium text-accent hover:bg-accent-muted transition-colors flex-1 text-left"
           >
             <Plus size={16} strokeWidth={2} />
             New chat
@@ -66,7 +66,7 @@ export function Sidebar() {
 
           {/* Workspaces section */}
           <div className="mb-1 px-2">
-            <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Workspaces</span>
+            <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider">Workspaces</span>
           </div>
 
           <div className="space-y-0.5 mb-4">
@@ -75,11 +75,11 @@ export function Sidebar() {
               if (name) {
                 useWorkspaceStore.getState().createProject(name);
               }
-            }} className="flex items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-colors w-full text-left">
+            }} className="flex items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-400 hover:text-secondary hover:bg-secondary-soft/30 transition-colors w-full text-left">
               <Plus size={14} strokeWidth={2} /> New workspace
             </button>
             <div className="flex items-center gap-1">
-              <label className="flex flex-1 items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer">
+              <label className="flex flex-1 items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-400 hover:text-secondary hover:bg-secondary-soft/30 transition-colors cursor-pointer">
                 <Upload size={14} strokeWidth={2} /> Import ZIP
                 <input type="file" accept=".zip" className="hidden" onChange={async (e) => {
                   if (e.target.files && e.target.files[0]) {
@@ -101,7 +101,7 @@ export function Sidebar() {
                     alert(err.message);
                   }
                 }
-              }} className="flex flex-1 items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-400 hover:text-white hover:bg-white/[0.06] transition-colors w-full text-left">
+              }} className="flex flex-1 items-center gap-2 rounded px-2 py-1.5 text-sm text-neutral-400 hover:text-secondary hover:bg-secondary-soft/30 transition-colors w-full text-left">
                 <Github size={14} strokeWidth={2} /> Import repo
               </button>
             </div>
@@ -115,8 +115,8 @@ export function Sidebar() {
               className={clsx(
                 "group flex items-center justify-between rounded px-2 py-1.5 text-sm cursor-pointer transition-colors", 
                 currentProjectId === proj.id 
-                  ? "bg-accent-muted text-white" 
-                  : "text-neutral-400 hover:bg-white/[0.06] hover:text-white"
+                  ? "bg-secondary-soft text-secondary" 
+                  : "text-neutral-400 hover:bg-secondary-soft/20 hover:text-secondary-muted"
               )}
             >
               <span className="truncate">{proj?.name || 'Untitled'}</span>
@@ -138,7 +138,7 @@ export function Sidebar() {
 
           {/* Chats section */}
           <div className="mb-1 px-2 mt-6">
-            <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Chats</span>
+            <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Chats</span>
           </div>
 
           <div className="space-y-0.5">
@@ -148,8 +148,8 @@ export function Sidebar() {
                 className={clsx(
                   'group flex items-center gap-2.5 rounded px-2 py-2 text-sm cursor-pointer transition-colors',
                   currentConversationId === conv.id
-                    ? 'bg-white/[0.08] text-white'
-                    : 'text-neutral-400 hover:bg-white/[0.06] hover:text-white'
+                    ? 'bg-accent-muted text-accent-hover'
+                    : 'text-neutral-400 hover:bg-white/[0.04] hover:text-white'
                 )}
                 onClick={() => setCurrentConversation(conv.id)}
               >

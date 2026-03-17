@@ -32,7 +32,7 @@ export function WorkspaceExplorer() {
     <div className="mt-3 border-t border-white/[0.06] pt-3">
       {/* Section header */}
       <div className="flex items-center justify-between px-2 mb-2">
-        <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+        <span className="text-[11px] font-semibold text-secondary uppercase tracking-wider">
           {currentProject.name}
         </span>
         <div className="flex items-center gap-0.5">

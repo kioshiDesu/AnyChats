@@ -40,7 +40,7 @@ export function ApplyAllModal({ files, onConfirm, onCancel, isApplying }: ApplyA
 
         <div className="flex-1 overflow-y-auto p-4">
           <div className="flex gap-3 mb-3">
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-success-soft rounded text-[11px] font-medium text-success">
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-secondary-soft rounded text-[11px] font-medium text-secondary">
               <FileCode size={12} strokeWidth={1.5} />
               {newCount} new
             </div>
@@ -65,7 +65,7 @@ export function ApplyAllModal({ files, onConfirm, onCancel, isApplying }: ApplyA
                 className="flex items-center gap-2.5 p-2.5 bg-surface-2 rounded border border-white/[0.06]"
               >
                 {file.isNew ? (
-                  <FileCode size={15} strokeWidth={1.5} className="text-success shrink-0" />
+                  <FileCode size={15} strokeWidth={1.5} className="text-secondary shrink-0" />
                 ) : (
                   <AlertCircle size={15} strokeWidth={1.5} className="text-warning shrink-0" />
                 )}

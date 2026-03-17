@@ -8,7 +8,7 @@
 @theme {
   --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
 
-  /* Neutral scale - cool-tinted blues for cohesion */
+  /* Neutral scale - cool-tinted blues */
   --color-neutral-50: oklch(97% 0.005 250);
   --color-neutral-100: oklch(94% 0.008 250);
   --color-neutral-200: oklch(88% 0.01 250);
@@ -21,18 +21,27 @@
   --color-neutral-900: oklch(16% 0.006 250);
   --color-neutral-950: oklch(12% 0.005 250);
 
-  /* Primary - sharp blue, restrained use */
-  --color-accent: oklch(55% 0.18 250);
-  --color-accent-soft: oklch(55% 0.12 250);
-  --color-accent-muted: oklch(25% 0.06 250);
+  /* Primary accent - vivid blue for actions and focus */
+  --color-accent: oklch(62% 0.22 250);
+  --color-accent-hover: oklch(68% 0.22 250);
+  --color-accent-soft: oklch(62% 0.14 250);
+  --color-accent-muted: oklch(26% 0.08 250);
 
-  /* Semantic */
-  --color-success: oklch(60% 0.15 155);
-  --color-success-soft: oklch(25% 0.05 155);
-  --color-warning: oklch(70% 0.15 75);
-  --color-warning-soft: oklch(28% 0.05 75);
-  --color-danger: oklch(55% 0.18 25);
-  --color-danger-soft: oklch(25% 0.06 25);
+  /* Secondary accent - warm amber for workspaces and secondary UI */
+  --color-secondary: oklch(78% 0.16 80);
+  --color-secondary-hover: oklch(82% 0.16 80);
+  --color-secondary-soft: oklch(30% 0.06 80);
+  --color-secondary-muted: oklch(78% 0.08 80);
+
+  /* Semantic colors - vibrant on dark backgrounds */
+  --color-success: oklch(68% 0.18 155);
+  --color-success-soft: oklch(26% 0.06 155);
+  --color-warning: oklch(78% 0.16 75);
+  --color-warning-soft: oklch(30% 0.06 75);
+  --color-danger: oklch(62% 0.22 25);
+  --color-danger-soft: oklch(26% 0.07 25);
+  --color-info: oklch(62% 0.18 260);
+  --color-info-soft: oklch(26% 0.07 260);
 
   /* Surface layers for dark mode depth */
   --color-surface-0: oklch(12% 0.005 250);
@@ -93,7 +102,7 @@ html, body, #root {
 
 /* Focus visible - keyboard only */
 *:focus-visible {
-  outline: 2px solid oklch(55% 0.18 250);
+  outline: 2px solid oklch(62% 0.22 250);
   outline-offset: 2px;
 }
 

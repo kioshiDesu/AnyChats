@@ -108,9 +108,9 @@ export function VersionHistoryModal({
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 p-2.5 bg-success-soft border border-success/20 rounded">
-                <FileCode size={13} strokeWidth={1.5} className="text-success" />
-                <span className="text-[13px] font-medium text-success">
+              <div className="flex items-center gap-2 p-2.5 bg-secondary-soft border border-secondary/20 rounded">
+                <FileCode size={13} strokeWidth={1.5} className="text-secondary" />
+                <span className="text-[13px] font-medium text-secondary">
                   Current version
                 </span>
               </div>

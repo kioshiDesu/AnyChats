@@ -297,7 +297,10 @@ export function Chat() {
           <Menu size={20} />
         </button>
         <div className="text-center space-y-3 max-w-sm px-6">
-          <h2 className="text-xl font-semibold text-white tracking-tight">OpenRouter Mobile Chat</h2>
+          <h2 className="text-xl font-semibold tracking-tight">
+            <span className="text-accent">OpenRouter</span>{' '}
+            <span className="text-white">Mobile Chat</span>
+          </h2>
           <p className="text-sm text-neutral-500 leading-relaxed">Select or create a conversation to get started</p>
         </div>
       </div>
@@ -321,11 +324,11 @@ export function Chat() {
               {currentConversation.title}
             </h1>
             {currentProject && (
-              <span className="text-[11px] font-medium text-neutral-500 shrink-0">
+              <span className="text-[11px] font-medium text-secondary shrink-0">
                 {currentProject.name}
               </span>
             )}
-            <span className="text-[11px] font-medium text-neutral-600 shrink-0">
+            <span className="text-[11px] font-medium text-neutral-500 shrink-0">
               {apiMode === 'local' ? 'Local' : 'Cloud'}
             </span>
             {isOffline && (
@@ -514,7 +517,7 @@ export function Chat() {
           )}
           <form
             onSubmit={handleSubmit}
-            className="relative flex items-end gap-2 bg-surface-1 rounded border border-white/[0.08] overflow-hidden focus-within:border-accent/40 transition-colors p-1.5"
+            className="relative flex items-end gap-2 bg-surface-1 rounded border border-white/[0.08] overflow-hidden focus-within:border-accent transition-colors p-1.5"
           >
             <textarea
               value={input}
@@ -547,10 +550,10 @@ export function Chat() {
               <button
                 type="button"
                 onClick={handleStop}
-                className="p-2 text-danger hover:bg-danger-soft rounded transition-colors shrink-0"
+                className="p-2 bg-danger text-white rounded transition-colors shrink-0"
                 aria-label="Stop generation"
               >
-                <StopCircle size={18} strokeWidth={1.5} />
+                <StopCircle size={18} strokeWidth={2} />
               </button>
             ) : isLoading ? (
               <button
@@ -565,9 +568,9 @@ export function Chat() {
                 type="submit"
                 disabled={!input.trim() || (apiMode === 'cloud' && !apiKey)}
                 aria-label="Send message"
-                className="p-2 text-accent hover:bg-accent-muted rounded transition-colors shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 bg-accent hover:bg-accent-hover text-white rounded transition-colors shrink-0 disabled:opacity-20 disabled:cursor-not-allowed"
               >
-                <Send size={18} strokeWidth={1.5} />
+                <Send size={18} strokeWidth={2} />
               </button>
             )}
           </form>
@@ -593,7 +596,7 @@ export function Chat() {
                 }
                 
                 setInput(`This workspace appears to be a ${projType} project. Can you explain the overall project architecture, entry points, and dependencies based on the current workspace context?`);
-              }} className="text-[12px] px-2.5 py-1 rounded bg-white/[0.06] text-neutral-400 hover:bg-white/[0.08] hover:text-neutral-300 transition-colors">Analyze architecture</button>
+              }} className="text-[12px] px-2.5 py-1 rounded bg-secondary-soft/30 text-secondary-muted hover:bg-secondary-soft/50 hover:text-secondary transition-colors">Analyze architecture</button>
               <button onClick={() => {
                 const worker = new Worker(new URL('../workers/eslint.worker.ts', import.meta.url), { type: 'module' });
                 worker.onmessage = (e) => {
@@ -607,8 +610,8 @@ export function Chat() {
                   worker.terminate();
                 };
                 worker.postMessage({ files });
-              }} className="text-[12px] px-2.5 py-1 rounded bg-white/[0.06] text-neutral-400 hover:bg-white/[0.08] hover:text-neutral-300 transition-colors">Lint review</button>
-              <button onClick={() => setInput("Create a new full-stack project structure for a [Describe your app] app.")} className="text-[12px] px-2.5 py-1 rounded bg-white/[0.06] text-neutral-400 hover:bg-white/[0.08] hover:text-neutral-300 transition-colors">Generate project</button>
+              }} className="text-[12px] px-2.5 py-1 rounded bg-accent-muted/50 text-accent-soft hover:bg-accent-muted hover:text-accent transition-colors">Lint review</button>
+              <button onClick={() => setInput("Create a new full-stack project structure for a [Describe your app] app.")} className="text-[12px] px-2.5 py-1 rounded bg-secondary-soft/30 text-secondary-muted hover:bg-secondary-soft/50 hover:text-secondary transition-colors">Generate project</button>
             </div>
           )}
         </div>

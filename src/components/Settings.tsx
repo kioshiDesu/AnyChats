@@ -449,12 +449,12 @@ export function SettingsModal() {
             
             <div className="space-y-2 text-sm text-neutral-300">
               <div className="flex justify-between items-center">
-                <span>Workspace usage</span>
+                <span className="text-secondary">Workspace usage</span>
                 <span className="font-medium">{storageQuota.formattedUsage} / {storageQuota.formattedQuota}</span>
               </div>
               <div className="w-full bg-surface-3 rounded-full h-1.5">
                 <div 
-                  className="bg-accent h-1.5 rounded-full transition-all duration-500"
+                  className="bg-secondary h-1.5 rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, storageQuota.percentUsed)}%` }}
                 ></div>
               </div>
