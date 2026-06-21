@@ -67,8 +67,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       };
       await dbService.saveProject(newProject);
       
-      const projects = await dbService.getProjects();
-      set({ projects, isLoading: false });
+      // Optimized: Single state update instead of reloading from DB
+      set((state) => ({ 
+        projects: [...state.projects, newProject],
+        isLoading: false 
+      }));
       return newProject;
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -84,17 +87,18 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     
     set({ isLoading: true, error: null });
     try {
-      const project = await dbService.getProject(id);
+      const [project, files] = await Promise.all([
+        dbService.getProject(id),
+        dbService.getFiles(id)
+      ]);
+      
       if (project) {
-        set({ currentProject: project });
-        await get().loadFiles(id);
+        set({ currentProject: project, files, isLoading: false });
       } else {
-        set({ currentProject: null, files: [], error: 'Project not found' });
+        set({ currentProject: null, files: [], error: 'Project not found', isLoading: false });
       }
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
-    } finally {
-      set({ isLoading: false });
     }
   },
 
@@ -102,16 +106,19 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await dbService.deleteProject(id);
-      const projects = await dbService.getProjects();
       
-      let updateState: Partial<WorkspaceState> = { projects, isLoading: false };
-      
-      if (get().currentProject?.id === id) {
-        updateState.currentProject = null;
-        updateState.files = [];
-      }
-      
-      set(updateState);
+      // Optimized: Update state directly instead of reloading
+      set((state) => {
+        const projects = state.projects.filter(p => p.id !== id);
+        let updateState: Partial<WorkspaceState> = { projects, isLoading: false };
+        
+        if (state.currentProject?.id === id) {
+          updateState.currentProject = null;
+          updateState.files = [];
+        }
+        
+        return updateState;
+      });
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
     }
@@ -130,7 +137,6 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   createFile: async (projectId: string, path: string, type: 'file' | 'folder', content: string = '') => {
     set({ isLoading: true, error: null });
     try {
-      // Check if file already exists
       const existing = await dbService.getFile(projectId, path);
       if (existing) {
         throw new Error(`Path ${path} already exists`);
@@ -148,14 +154,19 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       
       await dbService.saveFile(newFile);
       
-      // Update project last modified
-      const project = await dbService.getProject(projectId);
-      if (project) {
-        project.lastModified = Date.now();
-        await dbService.saveProject(project);
+      // Optimized: Update project timestamp and add file to state in one operation
+      const project = get().currentProject;
+      if (project && project.id === projectId) {
+        const updatedProject = { ...project, lastModified: Date.now() };
+        await dbService.saveProject(updatedProject);
+        set((state) => ({
+          files: [...state.files, newFile],
+          currentProject: updatedProject,
+          isLoading: false
+        }));
+      } else {
+        set({ isLoading: false });
       }
-
-      await get().loadFiles(projectId);
       return newFile;
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
@@ -175,8 +186,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       
       const file = files[fileIndex];
 
+      // Optimized: Parallel operations
+      const promises: Promise<any>[] = [];
+      
       if (saveVersion && file.content !== content) {
-        await dbService.saveFileVersion(id, file.content);
+        promises.push(dbService.saveFileVersion(id, file.content));
       }
 
       const updatedFile = {
@@ -185,16 +199,22 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         updatedAt: Date.now()
       };
       
-      await dbService.saveFile(updatedFile);
+      promises.push(dbService.saveFile(updatedFile));
       
-      // Update project last modified
-      const project = await dbService.getProject(file.projectId);
+      // Update project timestamp
+      const project = get().currentProject;
       if (project) {
-        project.lastModified = Date.now();
-        await dbService.saveProject(project);
+        const updatedProject = { ...project, lastModified: Date.now() };
+        promises.push(dbService.saveProject(updatedProject));
+        promises.push(Promise.resolve(updatedProject));
       }
       
-      await get().loadFiles(file.projectId);
+      await Promise.all(promises);
+      
+      // Update state with new file content
+      const newFiles = [...files];
+      newFiles[fileIndex] = updatedFile;
+      set({ files: newFiles, isLoading: false });
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
       throw error;
@@ -208,17 +228,24 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       const file = files.find(f => f.id === id);
       if (!file) return;
 
-      await dbService.deleteFileVersions(id);
-      await dbService.deleteFile(id);
+      // Optimized: Parallel operations
+      await Promise.all([
+        dbService.deleteFileVersions(id),
+        dbService.deleteFile(id)
+      ]);
       
-      // Update project last modified
-      const project = await dbService.getProject(file.projectId);
+      // Update project timestamp and remove file from state directly
+      const project = get().currentProject;
       if (project) {
-        project.lastModified = Date.now();
-        await dbService.saveProject(project);
+        const updatedProject = { ...project, lastModified: Date.now() };
+        await dbService.saveProject(updatedProject);
       }
-
-      await get().loadFiles(file.projectId);
+      
+      // Update state directly instead of reloading
+      set((state) => ({
+        files: state.files.filter(f => f.id !== id),
+        isLoading: false
+      }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
     }
@@ -230,18 +257,26 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       const files = await dbService.getFiles(projectId);
       const toDelete = files.filter(f => f.path === path || f.path.startsWith(`${path}/`));
       
-      for (const file of toDelete) {
-        await dbService.deleteFile(file.id);
-      }
+      // Optimized: Parallel deletion
+      await Promise.all(toDelete.map(file => 
+        Promise.all([
+          dbService.deleteFileVersions(file.id),
+          dbService.deleteFile(file.id)
+        ])
+      ));
       
-      // Update project last modified
+      // Update project timestamp
       const project = await dbService.getProject(projectId);
       if (project) {
         project.lastModified = Date.now();
         await dbService.saveProject(project);
       }
       
-      await get().loadFiles(projectId);
+      // Update state directly
+      set((state) => ({
+        files: state.files.filter(f => !toDelete.find(d => d.id === f.id)),
+        isLoading: false
+      }));
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
     }
@@ -263,37 +298,51 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       let targetFile: WorkspaceFile | undefined;
       let targetVersion: FileVersion | undefined;
 
-      for (const file of files) {
+      // Optimized: Parallel version fetching
+      const versionPromises = files.map(async file => {
         const versions = await dbService.getFileVersions(file.id);
         const version = versions.find(v => v.id === versionId);
         if (version) {
           targetFile = file;
           targetVersion = version;
-          break;
         }
-      }
+      });
+      
+      await Promise.all(versionPromises);
 
       if (!targetFile || !targetVersion) {
         throw new Error('Version not found');
       }
 
-      await dbService.saveFileVersion(targetFile.id, targetFile.content);
-
-      const updatedFile = {
-        ...targetFile,
-        content: targetVersion.content,
-        updatedAt: Date.now()
-      };
-      
-      await dbService.saveFile(updatedFile);
-      
-      const project = await dbService.getProject(targetFile.projectId);
-      if (project) {
-        project.lastModified = Date.now();
-        await dbService.saveProject(project);
-      }
-      
-      await get().loadFiles(targetFile.projectId);
+      // Optimized: Parallel save operations
+      await Promise.all([
+        dbService.saveFileVersion(targetFile.id, targetFile.content),
+        (async () => {
+          const updatedFile = {
+            ...targetFile,
+            content: targetVersion.content,
+            updatedAt: Date.now()
+          };
+          
+          await dbService.saveFile(updatedFile);
+          
+          const project = get().currentProject;
+          if (project) {
+            const updatedProject = { ...project, lastModified: Date.now() };
+            await dbService.saveProject(updatedProject);
+          }
+          
+          // Update state directly
+          set((state) => ({
+            files: state.files.map(f => f.id === targetFile!.id ? {
+              ...f,
+              content: targetVersion!.content,
+              updatedAt: Date.now()
+            } : f),
+            isLoading: false
+          }));
+        })()
+      ]);
     } catch (error: any) {
       set({ error: error.message, isLoading: false });
       throw error;
