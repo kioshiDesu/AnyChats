@@ -352,7 +352,7 @@ export function SettingsModal() {
                 </div>
               </div>
             )}
-            </div>
+          </div>
 
           <div className="space-y-4 pb-6">
             <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
