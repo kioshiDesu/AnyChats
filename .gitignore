@@ -2,29 +2,46 @@
 # Dependencies
 node_modules/
 
-# Build artifacts
+# Build outputs
 dist/
 build/
-*.map
+target/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.ENV
+.python-version
+.pytest_cache/
+.mypy_cache/
 
 # Logs
 *.log
 
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Environment variables
 .env
 .env.local
-*.env.*
+.env.*
+!.env.example
 
 # IDE
 .vscode/
 .idea/
-
-# OS generated
-.DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
 *.swp
 *.swo
 
@@ -32,17 +49,6 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environments
-venv/
-.venv/
-.env/
 
 # Compressed files
 *.zip
@@ -67,5 +73,4 @@ venv/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-
 ```

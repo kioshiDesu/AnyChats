@@ -27,9 +27,6 @@ export function SettingsModal() {
   const [inputApiMode, setInputApiMode] = useState(apiMode);
   const [inputLocalEndpoint, setInputLocalEndpoint] = useState(localEndpoint);
   
-  const [inputTemp, setInputTemp] = useState(temperature.toString());
-  const [inputTopP, setInputTopP] = useState(topP.toString());
-  const [inputMaxTokens, setInputMaxTokens] = useState(maxTokens?.toString() || '');
   const [modelSearch, setModelSearch] = useState('');
   const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
 
@@ -47,9 +44,6 @@ export function SettingsModal() {
     setInputStreaming(useStreaming);
     setInputApiMode(apiMode);
     setInputLocalEndpoint(localEndpoint);
-    setInputTemp(temperature.toString());
-    setInputTopP(topP.toString());
-    setInputMaxTokens(maxTokens?.toString() || '');
   }, [apiKey, systemPrompt, useStreaming, apiMode, localEndpoint, temperature, topP, maxTokens, isSettingsOpen]);
 
   useEffect(() => {
@@ -135,15 +129,6 @@ export function SettingsModal() {
       setSystemPrompt(inputPrompt);
       setUseStreaming(inputStreaming);
       
-      const pTemp = parseFloat(inputTemp);
-      if (!isNaN(pTemp)) setTemperature(pTemp);
-      
-      const pTopP = parseFloat(inputTopP);
-      if (!isNaN(pTopP)) setTopP(pTopP);
-      
-      const pMax = parseInt(inputMaxTokens);
-      setMaxTokens(isNaN(pMax) ? undefined : pMax);
-
       setSettingsOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
@@ -152,12 +137,10 @@ export function SettingsModal() {
     }
   };
 
-  if (!isSettingsOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60">
-      <div className="w-full max-w-md h-[100dvh] bg-neutral-950 shadow-xl border-l border-white/[0.06] flex flex-col animate-slide-in-right overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] flex-shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-md bg-surface-1 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/[0.06]">
+        <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
           <h2 className="text-base font-semibold text-white tracking-tight">
             Settings
           </h2>
@@ -370,50 +353,6 @@ export function SettingsModal() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-neutral-300">Temperature</label>
-                <input
-                  type="number" step="0.1" min="0" max="2"
-                  value={inputTemp} onChange={(e) => setInputTemp(e.target.value)}
-                  className="w-full px-2.5 py-2 border border-white/[0.08] rounded bg-surface-2 text-white text-sm outline-none focus:border-accent/40 transition-colors"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-neutral-300">Top P</label>
-                <input
-                  type="number" step="0.1" min="0" max="1"
-                  value={inputTopP} onChange={(e) => setInputTopP(e.target.value)}
-                  className="w-full px-2.5 py-2 border border-white/[0.08] rounded bg-surface-2 text-white text-sm outline-none focus:border-accent/40 transition-colors"
-                />
-              </div>
-              <div className="space-y-1 col-span-2">
-                <label className="text-sm font-medium text-neutral-300">Max tokens <span className="text-neutral-500 font-normal">(0 = unlimited)</span></label>
-                <input
-                  type="number" min="0" step="100"
-                  value={inputMaxTokens} onChange={(e) => setInputMaxTokens(e.target.value)}
-                  placeholder="Auto"
-                  className="w-full px-2.5 py-2 border border-white/[0.08] rounded bg-surface-2 text-white text-sm placeholder-neutral-600 outline-none focus:border-accent/40 transition-colors"
-                />
-              </div>
-              
-              <div className="col-span-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setInputTemp('0.1');
-                    setInputTopP('0.9');
-                    setInputMaxTokens('4096');
-                    setInputPrompt('You are an expert pair programmer. Always write clean, efficient, and well-documented code. When providing code blocks, always include the file path like ```language path="filename.ext"```.');
-                  }}
-                  className="w-full py-2 text-sm font-medium text-neutral-300 bg-surface-2 hover:bg-surface-3 rounded transition-colors border border-white/[0.08]"
-                >
-                  Apply coding presets
-                </button>
-              </div>
-            </div>
-          </div>
-
           <div className="space-y-4 pb-6">
             <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
               Chat
@@ -484,7 +423,6 @@ export function SettingsModal() {
               </div>
             </div>
           </div>
-
           {error && (
             <div className="flex items-center gap-2 text-danger text-sm bg-danger-soft p-3 rounded border border-danger/20">
               <AlertCircle size={14} strokeWidth={1.5} className="shrink-0" />

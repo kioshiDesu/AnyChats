@@ -155,12 +155,12 @@ const MessageComponent = ({ message, isTyping, onRetry, onApplyCode }: MessagePr
                 </div>
               )}
               {!isUser && codeBlocksWithPaths.length > 0 && (
-                <div className="mb-3 flex items-center gap-2">
+                <div className="mb-2 flex items-center gap-2">
                   <button
                     onClick={() => setShowApplyAllModal(true)}
-                    className="flex items-center gap-1.5 px-2.5 py-1 bg-secondary-soft text-secondary rounded text-xs font-medium hover:bg-secondary-soft/80 transition-colors"
+                    className="flex items-center gap-1.5 px-2 py-0.5 bg-secondary-soft text-secondary rounded text-[10px] font-medium hover:bg-secondary-soft/80 transition-colors"
                   >
-                    <Layers size={13} strokeWidth={1.5} />
+                    <Layers size={11} strokeWidth={1.5} />
                     Apply all ({codeBlocksWithPaths.length})
                   </button>
                 </div>
@@ -182,59 +182,56 @@ const MessageComponent = ({ message, isTyping, onRetry, onApplyCode }: MessagePr
                     const match = /language-(\w+)/.exec(className || '');
                     const language = match ? match[1] : '';
                     const text = String(codeChildren).replace(/\n$/, '');
+                    
+                    // Extract filename from meta
+                    let filename = null;
+                    if (node?.data?.meta || node?.meta) {
+                      const meta = (node?.data?.meta || node?.meta || '') as string;
+                      const fileMatch = meta.match(/(?:file|path|filename)="([^"]+)"/i) || meta.match(/(?:file|path|filename)=([^\s]+)/i) || meta.match(/([a-zA-Z0-9_.-]+\.[a-zA-Z0-9]+)/);
+                      filename = fileMatch ? (fileMatch[1] || fileMatch[0]) : null;
+                    }
 
                     return (
-                      <div className="not-prose my-4 w-full max-w-full overflow-hidden rounded bg-neutral-900 border border-white/[0.06] grid grid-cols-1">
-                        {/* Code header */}
-                        <div className="flex flex-wrap items-center justify-between px-3 py-1.5 bg-surface-2 border-b border-white/[0.06] gap-2 w-full min-w-0">
-                          <span className="text-[11px] font-mono text-neutral-500 select-none shrink-0">
+                      <div className="not-prose my-2 w-full max-w-full overflow-hidden rounded bg-neutral-900 border border-white/[0.06] grid grid-cols-1">
+                        {/* Code header - always visible */}
+                        <div className="flex flex-wrap items-center justify-between px-2.5 py-1.5 bg-surface-2 border-b border-white/[0.06] gap-2 w-full min-w-0">
+                          <span className="text-[10px] font-mono text-neutral-500 select-none shrink-0">
                             {language || 'text'}
                           </span>
                           
                           <div className="flex flex-wrap items-center gap-1 min-w-0">
-                            {node?.data?.meta || node?.meta ? (
-                              (() => {
-                                const meta = (node?.data?.meta || node?.meta || '') as string;
-                                const fileMatch = meta.match(/(?:file|path|filename)="([^"]+)"/i) || meta.match(/(?:file|path|filename)=([^\s]+)/i) || meta.match(/([a-zA-Z0-9_.-]+\.[a-zA-Z0-9]+)/);
-                                const filename = fileMatch ? (fileMatch[1] || fileMatch[0]) : null;
-                                
-                                if (filename) {
-                                  return (
-                                    <button
-                                      onClick={() => onApplyCode && onApplyCode(filename, text)}
-                                      className="flex items-center gap-1 px-2 py-0.5 text-[11px] rounded hover:bg-secondary-soft/30 text-secondary transition-colors min-w-0"
-                                      title={`Apply to ${filename}`}
-                                    >
-                                      <Check size={12} strokeWidth={2} className="shrink-0" />
-                                      <span className="truncate max-w-[80px] sm:max-w-[100px] md:max-w-[160px]">{filename}</span>
-                                    </button>
-                                  );
-                                }
-                                return null;
-                              })()
-                            ) : null}
+                            {filename && (
+                              <button
+                                onClick={() => onApplyCode && onApplyCode(filename, text)}
+                                className="flex items-center gap-1 px-2 py-0.5 text-[10px] rounded hover:bg-secondary-soft/30 text-secondary transition-colors min-w-0"
+                                title={`Apply to ${filename}`}
+                              >
+                                <Check size={11} strokeWidth={2} className="shrink-0" />
+                                <span className="truncate max-w-[80px] sm:max-w-[100px] md:max-w-[140px]">{filename}</span>
+                              </button>
+                            )}
                             <button
                               onClick={() => copyToClipboard(text)}
-                              className="flex items-center gap-1 px-2 py-0.5 text-[11px] rounded hover:bg-white/[0.06] text-neutral-400 transition-colors shrink-0"
+                              className="flex items-center gap-1 px-2 py-0.5 text-[10px] rounded hover:bg-white/[0.06] text-neutral-400 transition-colors shrink-0"
                             >
                               {copiedText === text ? (
-                                <><Check size={12} strokeWidth={2} className="text-success" /> <span className="text-success">Copied</span></>
+                                <><Check size={11} strokeWidth={2} className="text-success" /> <span className="text-success">Copied</span></>
                               ) : (
-                                <><Copy size={12} strokeWidth={1.5} /> <span>Copy</span></>
+                                <><Copy size={11} strokeWidth={1.5} /> <span>Copy</span></>
                               )}
                             </button>
                             <button
                               onClick={() => downloadCode(text, language)}
-                              className="flex items-center gap-1 px-2 py-0.5 text-[11px] rounded hover:bg-white/[0.06] text-neutral-400 transition-colors shrink-0"
+                              className="flex items-center gap-1 px-2 py-0.5 text-[10px] rounded hover:bg-white/[0.06] text-neutral-400 transition-colors shrink-0"
                               title="Download"
                             >
-                              <Download size={12} strokeWidth={1.5} />
+                              <Download size={11} strokeWidth={1.5} />
                             </button>
                           </div>
                         </div>
                         
-                        {/* Code content */}
-                        <Suspense fallback={<div className="text-neutral-500 p-4 font-mono text-xs">Loading...</div>}>
+                        {/* Code content - hidden by default, shown on click */}
+                        <Suspense fallback={<div className="text-neutral-500 p-3 font-mono text-xs">Loading...</div>}>
                           <div className="w-full max-w-full overflow-x-hidden min-w-0">
                             <CodeBlock {...codeProps} language={language || 'text'} text={text} />
                           </div>
