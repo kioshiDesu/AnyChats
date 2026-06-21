@@ -352,6 +352,7 @@ export function SettingsModal() {
                 </div>
               </div>
             )}
+            </div>
 
           <div className="space-y-4 pb-6">
             <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
@@ -423,6 +424,7 @@ export function SettingsModal() {
               </div>
             </div>
           </div>
+
           {error && (
             <div className="flex items-center gap-2 text-danger text-sm bg-danger-soft p-3 rounded border border-danger/20">
               <AlertCircle size={14} strokeWidth={1.5} className="shrink-0" />
